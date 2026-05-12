@@ -29,7 +29,7 @@ metadata:
 
 - [lark-cli](https://github.com/larksuite/cli)（Node.js ≥ 18）
 - 飞书账号 + 自建应用凭证（步骤 2 自动建）
-- 可读 [`../lark-shared/SKILL.md`](../../lark-shared/SKILL.md) 处理 scope / 权限（非必需，强烈建议）
+- （可选）如果你已经从 lark-cli skill 包里装了 `lark-shared` skill（同样落到 `.claude/skills/lark-shared/` 下），可读 [`../lark-shared/SKILL.md`](../../lark-shared/SKILL.md) 了解 scope / 权限处理细节；未装时本 skill 自包含全部必要步骤，可直接跳过此条
 
 ## 首次使用：自动安装与初始化
 
