@@ -9,7 +9,7 @@
       "entry": "SKILL.md",
       "primary": true,
       "role": "orchestrator",
-      "description": "知识沉淀编排器：每次问答的检索→回答→沉淀三步流程总控。"
+      "description": "知识沉淀编排器：每次问答的检索→回答→沉淀→收尾四步流程总控。"
     },
     {
       "name": "knowledge-write",
@@ -84,7 +84,7 @@
     },
     "fallback-when-not-detected": "走 lark-cli config init --new 普通自建应用流程（详见 .claude/skills/feishu-sync/SKILL.md 步骤 1–4）。"
   },
-  "claude-md-snippet": "## 知识沉淀（始终在线）\n\n任何问答交互后，**始终激活 `asknow` skill** 走 4 步：检索 → 回答 → 沉淀 → 收尾（自动同步飞书）。\n\n- **沉淀**：达不到深度基线时优先追加进已有文件，而不是新建浅层笔记。\n- **收尾**：若本回合有 md 更新且 `FEISHU_MAP.md` 顶部 `options.auto-sync-on-end: true`（默认），调用 `feishu-sync` 把变更增量推到飞书，把同步报告附在最终回复末尾。\n- **用户控制**：`/norecord`（跳过沉淀）/ `/nosync`（跳过本次同步）/ `/syncoff` `/syncon`（开关）/ `/synctarget`（切换 wiki/docs 目标）/ `/syncnow`（立即同步）。自然语言等价表达由 `asknow` skill 内部识别。",
+  "claude-md-snippet": "## 知识沉淀（始终在线）\n\n任何问答交互后，**始终激活 `asknow` skill** 走 4 步：检索 → 回答 → 沉淀 → 收尾（自动同步飞书）。\n\n- **沉淀**：达不到深度基线时优先追加进已有文件，而不是新建浅层笔记。\n- **收尾**：若本回合有 md 更新且 `FEISHU_MAP.md` 顶部 `options.auto-sync-on-end: true`（默认），调用 `feishu-sync` 把变更增量推到飞书，把同步报告附在最终回复末尾。\n- **用户控制（全部用自然语言表达，无需 slash 前缀）**：『这次不要记 / 跳过沉淀』『本次不要同步 / 跳过同步』『关闭自动同步 / 暂停自动同步』『开启自动同步 / 恢复自动同步』『切换同步目标 / 换个空间 / 同步到 <URL>』『现在同步一下 / 推到飞书 / 立即同步』『归到 <目录>』『用 <X> 作标签』『更新 <文件>』『标重要 / 高优先级』。所有指令由 asknow / feishu-sync 通过 description 关键词识别。",
   "install": {
     "tool": "skills (vercel-labs/skills)",
     "tool-upstream": "https://github.com/vercel-labs/skills",

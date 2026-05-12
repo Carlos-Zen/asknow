@@ -27,7 +27,7 @@ It is not a new note-taking app and not a chat skin. It's a **set of working rul
 
 ## One-line summary
 
-**AskNow = Claude Code + a `CLAUDE.md` rulebook + 1 orchestrator skill + 3 executor skills.**
+**AskNow = Claude Code + 1 orchestrator skill + 3 executor skills** (optionally + a `CLAUDE.md` snippet for always-on mode).
 
 `cd` into the project, run `claude`, chat normally. Claude will:
 
@@ -98,7 +98,7 @@ Notes link via `[[wiki-link]]`s, which auto-feed `GRAPH.md` to form a graph that
 | Content production | You type everything | AI writes well, nothing persists | **AI captures while answering** |
 | Structure | You design folders | None | **Forced taxonomy + templates** |
 | Linking | Manual | None | **AI maintains bidirectional links** |
-| Capture depth | Depends on your mood | 0 | **`CLAUDE.md` enforces 3-layer thinking + word-count floors** |
+| Capture depth | Depends on your mood | 0 | **The `knowledge-write` skill enforces 4-dimension thinking (≥ 3 of 4) + word-count floors** |
 | Data ownership | Vendor | OpenAI / Anthropic | **Local Markdown — yours** |
 | Team sharing | One vault each | One chat each | **Auto-sync to Lark/Feishu Wiki or Docs** |
 
@@ -194,26 +194,35 @@ Claude answers (citing reports and public data), then quietly:
 
 ---
 
-## In-conversation commands
+## In-conversation commands (all natural language)
 
-| Command | Effect |
+Just say it. **No slash prefix needed.** Skills match these via their `description` keywords.
+
+### Capture control
+
+| You say | Effect |
 |---|---|
-| `/norecord` | Don't capture this turn |
-| `/reclassify <dir>` | Force this content into a category (e.g. `/reclassify decisions`) |
-| `/retag <tag>` | Set the tag manually |
-| `/update <file>` | Append to a specific file instead of creating a new one |
-| `/important` | Mark as high importance |
-| `/nosync` | Skip Feishu auto-sync for this turn only |
-| `/syncoff` | Disable auto-sync (persisted to `FEISHU_MAP.md`) |
-| `/syncon` | Re-enable auto-sync |
-| `/synctarget <URL\|list>` | Switch Feishu target (paste a Feishu space/folder URL, or reply `list`) |
-| `/syncnow` | Trigger a full sync now |
+| "don't capture this" / "skip the capture" / "no need to record" | Don't write this turn |
+| "file under <dir>" / "put it in decisions" | Force category |
+| "tag it as X" / "use X as the tag" | Manual tag |
+| "update <file>" / "append to the existing Y file" | Append instead of new file |
+| "mark important" / "high importance" | Mark high importance (frontmatter) |
 
-**Slash-free equivalents (natural language works too):**
+### Sync control
 
-> "skip the sync this time" · "turn off auto-sync" · "switch the sync target" · "push to Feishu now" · "tidy up the knowledge base"
+| You say | Effect |
+|---|---|
+| "skip the sync this time" / "don't sync now" | Skip auto-sync this turn |
+| "turn off auto-sync" / "pause auto-sync" | Persist disable |
+| "turn on auto-sync" / "resume auto-sync" | Persist enable |
+| "switch the sync target" / "use another space" / "sync to <URL>" | Re-initialize Feishu target (paste URL to auto-parse; say "list" to enumerate spaces) |
+| "sync now" / "push to Feishu" | Trigger full sync immediately |
 
-When you want a tidy-up, just say *"maintain the knowledge base"* — Claude runs `knowledge-maintenance`, detects dead links, duplicates, orphans, tag drift, rebuilds indexes & graph, and hands you a report.
+### Maintenance
+
+| You say | Effect |
+|---|---|
+| "maintain the knowledge base" / "tidy up the wiki" / "clean duplicates" | Invoke `knowledge-maintenance` for full-library scan & repair |
 
 ---
 
@@ -224,7 +233,7 @@ Skills load on demand, not on every turn — keeps token cost low.
 ### 0. `asknow` — orchestrator
 
 **Triggers:** the user starts a Q&A in a project that already has the knowledge-base structure; or explicitly says "capture", "tidy up", "knowledge base"; or the target project's `CLAUDE.md` carries the always-on snippet (every turn activates it).
-**Does:** drives the 4-step flow each turn (search → answer → capture → tail-sync), decides when to delegate to the three executor skills, and parses user-control commands (`/norecord` / `/nosync` / `/synctarget` … plus their natural-language equivalents).
+**Does:** drives the 4-step flow each turn (search → answer → capture → tail-sync), decides when to delegate to the three executor skills, and parses user-control phrases in natural language ("skip the capture", "skip the sync", "switch the sync target", etc. — see "In-conversation commands").
 
 > **Why an orchestrator skill exists:** previously all the orchestration logic lived in the root `CLAUDE.md`. Lifting it into the `asknow` skill means **the whole project can be distributed as a skill pack to OpenClaw / Hermes / any other Claude Code project, without forcing the target to copy `CLAUDE.md`**. The source repo keeps its `CLAUDE.md` as the always-on activation config.
 
@@ -238,7 +247,7 @@ Skills load on demand, not on every turn — keeps token cost low.
 - Maintain bidirectional `related:` links
 - Append to today's journal, bump `STATUS.md`
 
-**Hard constraint:** `CLAUDE.md` enforces a *depth & length floor* — `concepts` notes 800–2000 words, `decisions` must include a trade-off table, `howto` must explain *why* per step, `cases` must hit the five-section pattern (symptom / investigation / root cause / fix / takeaway). When Claude can't reach the depth, it **appends to an existing file rather than creating a thin new one.** That's how the base avoids becoming a stream-of-consciousness graveyard.
+**Hard constraint:** The `knowledge-write` skill enforces a *depth & length floor* — `concepts` notes 800–2000 words, `decisions` must include a trade-off table, `howto` must explain *why* per step, `cases` must hit the five-section pattern (symptom / investigation / root cause / fix / takeaway). When Claude can't reach the depth, it **appends to an existing file rather than creating a thin new one.** That's how the base avoids becoming a stream-of-consciousness graveyard.
 
 ### 2. `knowledge-maintenance` — upkeep
 
@@ -256,8 +265,8 @@ Skills load on demand, not on every turn — keeps token cost low.
 ### 3. `feishu-sync` — push to Lark/Feishu (optional, dual-target)
 
 **Triggers:**
-- You say *"sync to Feishu"* / *"push to wiki"* / *"push to Feishu docs"* / `/syncnow` → full sync
-- You say *"switch sync target"* / `/synctarget` → re-run init
+- You say *"sync to Feishu"* / *"push to wiki"* / *"push to Feishu docs"* / *"sync now"* → full sync
+- You say *"switch sync target"* / *"use another space"* / *"another folder"* → re-run init
 - **Automatic:** any turn that produced `.md` changes and `FEISHU_MAP.md` has `auto-sync-on-end: true` (default) → incremental push (delegated by `asknow`)
 
 **Two sync targets (chosen at first init):**
@@ -423,7 +432,7 @@ When a turn changes `.md` files, Claude appends a "synced N file(s)" block with 
 
 > "turn off auto-sync" · "skip the sync this turn" · "switch the sync target to https://xxx.feishu.cn/drive/folder/..." · "push all `concepts/` notes tagged `importance: high` now"
 
-Or use slashes: `/syncoff`, `/nosync`, `/synctarget <URL>`, `/syncnow`. Full list in the table above.
+Full command list (all natural-language) is in the "In-conversation commands" section above. No slash prefix needed.
 
 ---
 
@@ -433,13 +442,13 @@ Or use slashes: `/syncoff`, `/nosync`, `/synctarget <URL>`, `/syncnow`. Full lis
 A: ChatGPT Memory is opaque, unreadable, non-portable, vendor-decided. AskNow's "memory" is local Markdown — readable, editable, portable, shareable, version-controllable.
 
 **Q: Won't Claude pollute the base with random files?**
-A: `CLAUDE.md` defines categorization rules, file granularity, depth floors, and dedup logic. The `knowledge-maintenance` skill cleans up periodically. Worst case: a few extra files — delete them. It's all plain Markdown.
+A: The `asknow` / `knowledge-write` skills define categorization rules, file granularity, depth floors, and dedup logic. The `knowledge-maintenance` skill cleans up periodically. Worst case: a few extra files — delete them. It's all plain Markdown.
 
 **Q: Will it create files for every chat?**
-A: No. `CLAUDE.md` explicitly excludes small talk, raw commands, trivial content. Multi-turn conversations append to the same file. Below the depth floor → merge into an existing file rather than create a thin one.
+A: No. The `asknow` skill explicitly excludes small talk, raw commands, trivial content. Multi-turn conversations append to the same file. Below the depth floor → merge into an existing file rather than create a thin one.
 
 **Q: Can I use it with GPT or Gemini?**
-A: The `CLAUDE.md` rules can port, but the skill system is Claude Code-specific. Effect on other AIs is degraded.
+A: The rules in `SKILL.md` files can port, but the skill system itself is Claude Code-specific. Effect on other AIs is degraded.
 
 **Q: What about long-term volume?**
 A: Journals auto-archive quarterly after 90 days. `knowledge-maintenance` merges duplicates. `STATUS.md` tracks global state. It scales.

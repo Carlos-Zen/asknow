@@ -1,6 +1,6 @@
 ---
 name: feishu-sync
-description: "将本地知识库 Markdown 同步到飞书。支持两种目标：飞书知识库 wiki（嵌套节点）或飞书云文档（folder 下的 docx / markdown）。首次初始化时由用户选择目标类型并指定知识空间 / 文件夹（或贴飞书链接自动解析），之后默认同步到既定目标；每次对话有更新默认自动推送，可对话切换关闭。"
+description: "把本地知识库 Markdown 同步到飞书。ALWAYS invoke this skill when the user 用以下任一自然语言短语表达同步意图：同步到飞书、推到飞书、推到 wiki、推到飞书文档、发布到飞书、立即同步、现在同步一下、关闭自动同步、暂停自动同步、停止自动同步、开启自动同步、恢复自动同步、切换同步目标、换个空间、换个文件夹、本次跳过同步、本次不要同步。支持两种目标：飞书知识库 wiki（嵌套节点）或飞书云文档（folder 下的 docx / markdown）。首次初始化时由用户选择目标类型并指定知识空间 / 文件夹（或贴飞书链接自动解析），之后默认同步到既定目标；每次对话有更新默认自动推送，可对话切换关闭。"
 metadata:
   requires:
     bins: ["lark-cli"]
@@ -183,9 +183,9 @@ asknow-sync:
 
 ## 触发场景
 
-- "同步到飞书""推送到 wiki""推送到飞书文档"或 `/syncnow`
-- "切换同步目标""换个空间"或 `/synctarget`
-- "关闭/开启自动同步"或 `/syncoff` / `/syncon`
+- "同步到飞书" / "推送到 wiki" / "推送到飞书文档" / "立即同步"
+- "切换同步目标" / "换个空间" / "换个文件夹"
+- "关闭/开启自动同步"
 - **自动**：orchestrator 检测到本回合有 md 更新 + `auto-sync-on-end=true` + 用户未跳过 → 收尾时调用
 
 ## 核心流程
@@ -268,16 +268,16 @@ lark-cli markdown +overwrite \
 
 | 用户说 | 行为 | 持久化 |
 |--------|-----|------|
-| "本次跳过" / `/nosync` | 当回合 skip | 否 |
-| "关闭自动同步" / `/syncoff` | `auto-sync-on-end: false` | 是 |
-| "开启自动同步" / `/syncon` | `auto-sync-on-end: true` | 是 |
-| "现在同步一下" / `/syncnow` | 立即执行完整同步 | 否 |
+| "本次跳过" / "本次不要同步" | 当回合 skip | 否 |
+| "关闭自动同步" / "暂停自动同步" | `auto-sync-on-end: false` | 是 |
+| "开启自动同步" / "恢复自动同步" | `auto-sync-on-end: true` | 是 |
+| "现在同步一下" / "立即同步" / "推到飞书" | 立即执行完整同步 | 否 |
 
 修改时**只动那一行**，保留其它字段与表格。
 
 ### Orchestrator 集成约定
 
-orchestrator（`asknow` / 项目 `CLAUDE.md`）在每次交互的步骤 3 沉淀末尾：
+orchestrator（`asknow` skill）在每次交互的步骤 3 沉淀末尾：
 
 1. 本回合无 md 更新 → 结束
 2. `auto-sync-on-end=false` → 结束（可选轻提示）

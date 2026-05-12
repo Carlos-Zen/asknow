@@ -102,7 +102,7 @@ asknow-sync:
   # 不要手动编辑；按对话引导走（例："同步到飞书"会启动初始化向导）。
   target: null
   options:
-    auto-sync-on-end: true        # 默认开启；用对话"关闭自动同步"或 /syncoff 暂停
+    auto-sync-on-end: true        # 默认开启；说"关闭自动同步""暂停自动同步"可关
   configured-at: null
 -->
 # 飞书同步映射
