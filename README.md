@@ -142,7 +142,7 @@ npx skills add Carlos-Zen/asknow --list
 
 **What `npx skills` does NOT do:** run `scripts/bootstrap.sh`, bind `lark-cli`, or edit `CLAUDE.md`. Bootstrap happens via either of:
 
-1. **Automatic (zero-friction):** Just open Claude Code in the target project and ask anything → the `asknow` skill activates → it checks if the `wiki/` skeleton exists and offers to create it inline (5 meta files + 7 category dirs). No command needed.
+1. **Automatic (zero-friction):** Just open Claude Code in the target project and ask anything → the `asknow` skill activates → it checks the knowledge-base skeleton under `./` and offers to create it inline (5 meta files + 7 category dirs). No command needed.
 2. **Manual:** Run the bootstrap script once:
    ```bash
    curl -fsSL https://raw.githubusercontent.com/Carlos-Zen/asknow/main/scripts/bootstrap.sh | bash

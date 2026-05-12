@@ -2,8 +2,8 @@
 # tests/lib/assert.sh — 通用断言库
 # 所有断言：成功 return 0；失败 echo "FAIL: ..." 并 return 1。
 #
-# 关键设计：项目内部对知识库根路径存在不一致（CLAUDE.md 的 ASCII 树用 wiki/，
-# 而 bootstrap.sh 与 asknow SKILL.md 用 ./）。为不让本项目缺陷污染测试信号，
+# 关键设计：项目当前统一以 ./ 作为知识库根（CLAUDE.md / bootstrap.sh / 全部 SKILL.md
+# 一致）。为兼容 fork 用户保留 wiki/ 习惯，或 LLM 偶发把骨架放进 wiki/ 子目录的情况，
 # 大多数路径断言对 ./<p> 与 ./wiki/<p> 都接受；具体被采用的根会在日志里显式标注。
 
 # 返回当前 fixture 的知识库实际根（"." 或 "wiki"），凭目录内容判断
@@ -105,44 +105,46 @@ _find_status_file() {
   return 1
 }
 
+# Read field from both ./STATUS.md and ./wiki/STATUS.md, return the MAX numeric value.
+_read_status_field_max() {
+  local field="$1"
+  local max=""
+  for f in STATUS.md wiki/STATUS.md; do
+    [[ -f "$f" ]] || continue
+    local v
+    v=$(awk -v field="$field" '
+      $0 ~ "^[[:space:]]*[-*]?[[:space:]]*"field":[[:space:]]*" {
+        n = $NF; gsub(/[^0-9-]/, "", n); print n; exit
+      }
+    ' "$f")
+    if [[ -n "$v" && "$v" =~ ^-?[0-9]+$ ]]; then
+      if [[ -z "$max" ]] || [[ "$v" -gt "$max" ]]; then max="$v"; fi
+    fi
+  done
+  echo "$max"
+}
+
 assert_status_field_gt() {
   local file="$1" field="$2" min="$3"
-  # 接受 "STATUS.md" 字面或自动找
-  local target=""
-  if [[ -f "$file" ]]; then target="$file"
-  elif [[ -f "wiki/$file" ]]; then target="wiki/$file"
-  fi
-  if [[ -z "$target" ]]; then echo "FAIL: $file not exists (also tried wiki/)"; return 1; fi
+  # file param kept for backward-compat; we scan all known STATUS.md locations
   local val
-  val=$(awk -v field="$field" '
-    $0 ~ "^[-*][[:space:]]*"field":[[:space:]]*" {
-      n = $NF; gsub(/[^0-9-]/, "", n); print n; exit
-    }
-  ' "$target")
-  if [[ -z "$val" ]]; then echo "FAIL: $target: field '$field' not found"; return 1; fi
+  val=$(_read_status_field_max "$field")
+  if [[ -z "$val" ]]; then echo "FAIL: STATUS.md (./ or wiki/): field '$field' not found"; return 1; fi
   if [[ "$val" =~ ^-?[0-9]+$ ]] && [[ "$val" -gt "$min" ]]; then return 0; fi
-  echo "FAIL: $target: $field=$val, expected > $min"
+  echo "FAIL: STATUS.md: $field=$val (max across ./ and wiki/), expected > $min"
   return 1
 }
 
 assert_status_field_ge() {
   local file="$1" field="$2" min="$3"
-  local target=""
-  if [[ -f "$file" ]]; then target="$file"
-  elif [[ -f "wiki/$file" ]]; then target="wiki/$file"
-  fi
-  if [[ -z "$target" ]]; then echo "FAIL: $file not exists (also tried wiki/)"; return 1; fi
   local val
-  val=$(awk -v field="$field" '
-    $0 ~ "^[-*][[:space:]]*"field":[[:space:]]*" {
-      n = $NF; gsub(/[^0-9-]/, "", n); print n; exit
-    }
-  ' "$target")
-  if [[ -z "$val" ]]; then echo "FAIL: $target: field '$field' not found"; return 1; fi
+  val=$(_read_status_field_max "$field")
+  if [[ -z "$val" ]]; then echo "FAIL: STATUS.md (./ or wiki/): field '$field' not found"; return 1; fi
   if [[ "$val" =~ ^-?[0-9]+$ ]] && [[ "$val" -ge "$min" ]]; then return 0; fi
-  echo "FAIL: $target: $field=$val, expected >= $min"
+  echo "FAIL: STATUS.md: $field=$val (max across ./ and wiki/), expected >= $min"
   return 1
 }
+
 
 assert_feishu_option() {
   local file="$1" key="$2" expected="$3"

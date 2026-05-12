@@ -88,18 +88,18 @@
   "install": {
     "tool": "skills (vercel-labs/skills)",
     "tool-upstream": "https://github.com/vercel-labs/skills",
-    "prerequisite": "项目先推到 public GitHub；npx skills 通过 <owner>/<repo> 简写从 GitHub 拉取仓库内的 .claude/skills/*/SKILL.md。把下方 <owner> 换成实际 GitHub 用户名。",
+    "prerequisite": "本仓库 Carlos-Zen/asknow 已推到 public GitHub。npx skills 通过 <owner>/<repo> 简写从 GitHub 拉取仓库内的 .claude/skills/*/SKILL.md；fork 用户把命令里的 Carlos-Zen 换成自己的 GitHub 用户名即可。",
     "commands": {
-      "project": "npx skills add <owner>/asknow -p",
-      "global": "npx skills add <owner>/asknow -g",
-      "multi-agent": "npx skills add <owner>/asknow -a claude-code -a openclaw -a hermes-agent",
-      "specific-skill": "npx skills add <owner>/asknow --skill asknow --skill knowledge-write",
-      "list-only": "npx skills add <owner>/asknow --list"
+      "project": "npx skills add Carlos-Zen/asknow -p",
+      "global": "npx skills add Carlos-Zen/asknow -g",
+      "multi-agent": "npx skills add Carlos-Zen/asknow -a claude-code -a openclaw -a hermes-agent",
+      "specific-skill": "npx skills add Carlos-Zen/asknow --skill asknow --skill knowledge-write",
+      "list-only": "npx skills add Carlos-Zen/asknow --list"
     },
     "supported-agents-via-skills-cli": "claude-code / openclaw / hermes-agent / cursor / codex / opencode / windsurf 等 54 个，完整列表见 vercel-labs/skills README",
     "post-install": {
-      "auto-bootstrap": "首次激活 asknow skill 时，skill 自动判断 wiki/ 骨架是否存在，缺则在对话里向用户确认后创建占位（INDEX.md / GRAPH.md / TAGS.md / STATUS.md / FEISHU_MAP.md + 6 个分类目录 + journal/）。不依赖 scripts/bootstrap.sh。",
-      "manual-bootstrap": "或一行拉脚本跑一次：curl -fsSL https://raw.githubusercontent.com/<owner>/asknow/main/scripts/bootstrap.sh | bash"
+      "auto-bootstrap": "首次激活 asknow skill 时，skill 自动判断项目根 ./ 下知识库骨架是否存在，缺则在对话里向用户确认后创建占位（INDEX.md / GRAPH.md / TAGS.md / STATUS.md / FEISHU_MAP.md + 6 个分类目录 + journal/）。不依赖 scripts/bootstrap.sh。",
+      "manual-bootstrap": "或一行拉脚本跑一次：curl -fsSL https://raw.githubusercontent.com/Carlos-Zen/asknow/main/scripts/bootstrap.sh | bash"
     },
     "manual-clone": "完全本地：git clone → bash scripts/bootstrap.sh → 把 .claude/skills/ 复制到目标项目（或 ~/.claude/skills/ 做全局）。"
   },

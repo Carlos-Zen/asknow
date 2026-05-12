@@ -145,7 +145,7 @@ npx skills add Carlos-Zen/asknow --list
 
 **`npx skills` 不做什么：** 不会跑 `scripts/bootstrap.sh`、不会绑 lark-cli、不会修改 CLAUDE.md。Bootstrap 由下面两条路径中**任一**完成即可：
 
-1. **自动（推荐，零摩擦）：** 装完直接打开 Claude Code 在目标项目里随便问个问题 → `asknow` skill 激活 → 自动判断 `wiki/` 骨架是否存在，缺则在对话里向你确认后创建占位（5 个元文件 + 7 个目录）。不需要任何命令。
+1. **自动（推荐，零摩擦）：** 装完直接打开 Claude Code 在目标项目里随便问个问题 → `asknow` skill 激活 → 自动判断项目根 `./` 下知识库骨架是否存在，缺则在对话里向你确认后创建占位（5 个元文件 + 7 个目录）。不需要任何命令。
 2. **手动：** 拉脚本跑一次（适合预先初始化）：
    ```bash
    curl -fsSL https://raw.githubusercontent.com/Carlos-Zen/asknow/main/scripts/bootstrap.sh | bash
