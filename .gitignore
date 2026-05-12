@@ -1,0 +1,39 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local Claude state
+.claude/settings.local.json
+
+# 运行时知识库内容（由 bootstrap.sh 在目标项目本地生成；仅排除仓库根，不影响 tests/cases 等子目录）
+/INDEX.md
+/GRAPH.md
+/TAGS.md
+/STATUS.md
+/FEISHU_MAP.md
+/concepts/
+/howto/
+/insights/
+/references/
+/decisions/
+/cases/
+/journal/
+
+# 本地草稿
+goal.md
+
+# 测试工件
+tests/.work/
+tests/reports/
+
+# Node
+node_modules/
+npm-debug.log*

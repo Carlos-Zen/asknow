@@ -1,0 +1,108 @@
+{
+  "name": "asknow",
+  "version": "0.1.0",
+  "description": "在 AI 问答中自动把内容沉淀为可检索、可关联、可溯源的 Markdown 知识库。可分发为 Claude Code skill pack，支持 OpenClaw / Hermes harness 一键安装与绑定。",
+  "skills": [
+    {
+      "name": "asknow",
+      "path": ".claude/skills/asknow",
+      "entry": "SKILL.md",
+      "primary": true,
+      "role": "orchestrator",
+      "description": "知识沉淀编排器：每次问答的检索→回答→沉淀三步流程总控。"
+    },
+    {
+      "name": "knowledge-write",
+      "path": ".claude/skills/knowledge-write",
+      "entry": "SKILL.md",
+      "role": "executor",
+      "description": "把单次问答写入分类目录下的 Markdown，维护双向链接与索引计数器。"
+    },
+    {
+      "name": "knowledge-maintenance",
+      "path": ".claude/skills/knowledge-maintenance",
+      "entry": "SKILL.md",
+      "role": "executor",
+      "description": "全库扫描、死链/重复/孤岛检测与修复，重建 INDEX/GRAPH。"
+    },
+    {
+      "name": "feishu-sync",
+      "path": ".claude/skills/feishu-sync",
+      "entry": "SKILL.md",
+      "role": "executor",
+      "optional": true,
+      "description": "把本地知识库 Markdown 同步到飞书 — 支持两种载体（首次初始化时选择，配置写入 FEISHU_MAP.md 顶部 frontmatter）：wiki（飞书知识库嵌套节点）或 docs（云空间 folder 下的 docx 富文本 / markdown 文件）。默认对话结束有更新自动增量同步，可通过对话『关闭自动同步』暂停。"
+    }
+  ],
+  "requires": {
+    "runtime": {
+      "node": ">=18"
+    },
+    "bins": {
+      "lark-cli": {
+        "version": ">=1.0.0",
+        "optional": true,
+        "used-by": ["feishu-sync"],
+        "install": "npm install -g @larksuite/cli",
+        "upstream": "https://github.com/larksuite/cli"
+      }
+    }
+  },
+  "bootstrap": {
+    "script": "scripts/bootstrap.sh",
+    "idempotent": true,
+    "creates": {
+      "files": [
+        "INDEX.md",
+        "GRAPH.md",
+        "TAGS.md",
+        "STATUS.md",
+        "FEISHU_MAP.md"
+      ],
+      "directories": [
+        "concepts",
+        "howto",
+        "insights",
+        "references",
+        "decisions",
+        "cases",
+        "journal",
+        "journal/archive"
+      ]
+    }
+  },
+  "harness": {
+    "supports": ["openclaw", "hermes"],
+    "detect-env": ["OPENCLAW_HOME", "HERMES_HOME"],
+    "auto-bind": {
+      "tool": "lark-cli",
+      "command": "lark-cli config bind",
+      "requires-user-confirmation": ["identity"],
+      "default-identity": "user-default",
+      "identity-rationale": "默认走个人知识库 my_library，写入个人资源必须用 user 身份；只同步团队空间时回退 bot-only。",
+      "skip-auth-login-when-bound": true
+    },
+    "fallback-when-not-detected": "走 lark-cli config init --new 普通自建应用流程（详见 .claude/skills/feishu-sync/SKILL.md 步骤 1–4）。"
+  },
+  "claude-md-snippet": "## 知识沉淀（始终在线）\n\n任何问答交互后，**始终激活 `asknow` skill** 走 4 步：检索 → 回答 → 沉淀 → 收尾（自动同步飞书）。\n\n- **沉淀**：达不到深度基线时优先追加进已有文件，而不是新建浅层笔记。\n- **收尾**：若本回合有 md 更新且 `FEISHU_MAP.md` 顶部 `options.auto-sync-on-end: true`（默认），调用 `feishu-sync` 把变更增量推到飞书，把同步报告附在最终回复末尾。\n- **用户控制**：`/norecord`（跳过沉淀）/ `/nosync`（跳过本次同步）/ `/syncoff` `/syncon`（开关）/ `/synctarget`（切换 wiki/docs 目标）/ `/syncnow`（立即同步）。自然语言等价表达由 `asknow` skill 内部识别。",
+  "install": {
+    "tool": "skills (vercel-labs/skills)",
+    "tool-upstream": "https://github.com/vercel-labs/skills",
+    "prerequisite": "项目先推到 public GitHub；npx skills 通过 <owner>/<repo> 简写从 GitHub 拉取仓库内的 .claude/skills/*/SKILL.md。把下方 <owner> 换成实际 GitHub 用户名。",
+    "commands": {
+      "project": "npx skills add <owner>/asknow -p",
+      "global": "npx skills add <owner>/asknow -g",
+      "multi-agent": "npx skills add <owner>/asknow -a claude-code -a openclaw -a hermes-agent",
+      "specific-skill": "npx skills add <owner>/asknow --skill asknow --skill knowledge-write",
+      "list-only": "npx skills add <owner>/asknow --list"
+    },
+    "supported-agents-via-skills-cli": "claude-code / openclaw / hermes-agent / cursor / codex / opencode / windsurf 等 54 个，完整列表见 vercel-labs/skills README",
+    "post-install": {
+      "auto-bootstrap": "首次激活 asknow skill 时，skill 自动判断 wiki/ 骨架是否存在，缺则在对话里向用户确认后创建占位（INDEX.md / GRAPH.md / TAGS.md / STATUS.md / FEISHU_MAP.md + 6 个分类目录 + journal/）。不依赖 scripts/bootstrap.sh。",
+      "manual-bootstrap": "或一行拉脚本跑一次：curl -fsSL https://raw.githubusercontent.com/<owner>/asknow/main/scripts/bootstrap.sh | bash"
+    },
+    "manual-clone": "完全本地：git clone → bash scripts/bootstrap.sh → 把 .claude/skills/ 复制到目标项目（或 ~/.claude/skills/ 做全局）。"
+  },
+  "repository": "https://github.com/Carlos-Zen/asknow",
+  "license": "MIT"
+}

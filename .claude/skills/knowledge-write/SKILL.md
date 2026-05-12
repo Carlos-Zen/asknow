@@ -1,0 +1,146 @@
+---
+name: knowledge-write
+description: "将问答内容沉淀为知识库文件 — 分类、写入、关联、更新状态。"
+---
+
+# Knowledge Write
+
+当 CLAUDE.md 判断本次交互值得沉淀时调用此 skill。执行：分类 → 查重 → 写入/更新文件 → 维护关联 → 写 journal → 更新 STATUS.md。
+
+## 文件粒度
+
+一个文件 = 一个可独立理解的知识单元。
+
+- 能独立成篇（有定义、场景、关联）→ 独立文件
+- 离开父主题无意义或 < 3 句话 → 父文件的一节
+- 跨两个类别 → 按类别拆两个文件
+- 是对已有文件的补充 → 更新已有文件
+
+## 多轮对话
+
+- 追问深化同一主题 → 更新已有文件
+- 切换场景且变体大 → 新建并关联
+- 引出新主题 → 新建并关联
+- 用户纠正 → 修正文件，记 revision
+
+对话告一段落时确保每个文件独立自洽。
+
+## 文件模板
+
+```markdown
+---
+title: 标题
+category: concepts|howto|insights|references|decisions|cases
+tags: [标签1, 标签2]
+related:
+  - path: category/file.md
+    type: 依赖|同类|应用|对比|关联
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+source: 问答|用户提供|外部引用
+importance: normal|high
+revisions:
+  - date: YYYY-MM-DD
+    summary: 说明
+---
+
+# 标题
+
+## 核心要点
+3-5 句话概括。
+
+## 详细内容
+按 category 组织：
+- concepts: 定义→特征→场景→误解
+- howto: 前置条件→步骤→注意事项
+- insights: 现象→原因→推论
+- references: 表格/清单按逻辑分组
+- decisions: 背景→对比→推荐→适用条件
+- cases: 背景→过程→结果→教训
+
+## 引用来源
+- [来源标题](URL) — 引用了什么内容，如"市场规模数据"
+- 来源名称, 发布日期 — 无 URL 时的格式
+
+## 关联知识
+- [[条目]] — (类型) 说明
+```
+
+## 引用来源规则
+
+知识库中的事实性内容必须标注来源，以便读者判断可信度。
+
+### 必须标注来源的内容
+
+- 数据统计（市场规模、用户数、增长率、份额等）
+- 技术规格（性能参数、版本特性、兼容性等）
+- 行业报告结论或预测
+- 研究发现或实验结果
+- 非常识性的事实主张
+
+### 来源优先级
+
+1. **官方文档 / 一手来源**：产品官网、官方 blog、GitHub repo、RFC
+2. **学术 / 权威报告**：论文、Gartner/IDC/McKinsey 等机构报告
+3. **可信媒体 / 行业分析**：TechCrunch、InfoQ、公司财报
+4. **社区共识**：Stack Overflow 高票回答、知名开发者博客（标注为社区来源）
+
+### 标注格式
+
+在文件的"引用来源"部分集中列出，正文中用角标 `[1]` `[2]` 指向：
+
+```markdown
+市场规模约为 150 亿美元 [1]，年增长率 12% [2]。
+
+## 引用来源
+- [1] [Gartner Report 2025](https://...) — 全球市场规模数据
+- [2] [IDC Forecast](https://...) — 2024-2028 增长预测
+```
+
+### 无法提供来源时
+
+- AI 基于训练知识回答但无具体来源 → 标注 `(AI 综合, 未经独立验证)`
+- 用户提供的信息 → 标注 `source: 用户提供`，不额外加引用
+- 有争议或不确定 → 正文中标注"据 XX 报告…，但也有观点认为…"
+
+## 关联类型
+
+依赖（理解 A 需要 B）| 同类（近似概念）| 应用（A 是 B 的实践）| 对比（竞争选项）| 关联（弱关联）
+
+related 路径相对于 `./`。
+
+## 命名
+
+小写英文短横线优先。无通用英文名时允许拼音或中文短名。3-6 词。
+
+## 标签
+
+写入前查 TAGS.md：命中→用标准名；未命中→新领域则注册，已有变体则加 aliases。每文件 2-5 个标签。
+
+## 修订
+
+更新正文 → frontmatter revisions 追加一条 → 争议内容并列呈现并标注依据。
+
+## 质量要求
+
+1. 语言跟随交互语言
+2. 去对话痕迹，客观表述
+3. 独立可读
+4. 精炼
+5. 不确定信息标注
+6. 用户提供的信息标注 source
+7. **事实性内容必须标注引用来源**，无来源时标注 `(AI 综合, 未经独立验证)`
+
+## 写入后操作
+
+1. 更新 TAGS.md（如有新标签）
+2. 追加 journal：`### HH:MM — 简述` + 输入/结论/写入/动作
+3. 更新 STATUS.md：total_files（如新建）+1，files_since_last_index +1，relations_since_last_graph +N
+4. 告知用户写入了哪些文件（一句话）
+
+## 示例
+
+- **概念：** "什么是 Raft？" → 新建 concepts/raft-consensus.md, tags:[分布式系统,共识算法], related→concepts/paxos.md(同类), 引用来源→Raft 论文原文
+- **陈述：** "我们决定用 Shopify" → 新建 decisions/shopify-vs-self-built.md, source:用户提供
+- **多轮：** Q1→decisions/kafka-vs-rabbitmq.md → Q2"exactly-once?"→新建 insights/kafka-exactly-once.md(related type:应用), 引用→Kafka 官方文档 KIP-98
+- **模糊：** "Docker 是什么+怎么装" → 拆 concepts/docker.md + howto/docker-install-mac.md, 互相 related(应用)

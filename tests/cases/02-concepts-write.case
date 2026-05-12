@@ -1,0 +1,8 @@
+ID="02-concepts-write"
+DESC="问『什么是 RAG』后 concepts/ 下应有新增 md 且 frontmatter.category=concepts"
+PROMPT="什么是 RAG（Retrieval Augmented Generation）？给我讲讲核心定义、原理、与 fine-tuning 的对比，以及典型应用场景。要求按知识库沉淀规则把这次问答写入。"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_dir_has_md concepts
+assert_dir_md_frontmatter concepts category concepts
+assert_status_field_gt STATUS.md total_files 0"

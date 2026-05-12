@@ -1,0 +1,6 @@
+ID="05-syncoff-persistence"
+DESC="发 /syncoff 后 FEISHU_MAP.md 顶部 auto-sync-on-end 应变 false"
+PROMPT="/syncoff 关闭自动同步，并把这个设置持久化到 FEISHU_MAP.md。"
+SKIP_HARNESS="hermes"
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_feishu_option FEISHU_MAP.md auto-sync-on-end false"

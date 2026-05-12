@@ -1,0 +1,19 @@
+ID="01-bootstrap"
+DESC="bootstrap.sh 在空目录跑后骨架文件全部存在"
+PROMPT=""
+NO_LLM="true"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_file_exists INDEX.md
+assert_file_exists GRAPH.md
+assert_file_exists TAGS.md
+assert_file_exists STATUS.md
+assert_file_exists FEISHU_MAP.md
+assert_dir_exists concepts
+assert_dir_exists howto
+assert_dir_exists insights
+assert_dir_exists references
+assert_dir_exists decisions
+assert_dir_exists cases
+assert_dir_exists journal
+assert_dir_exists journal/archive"

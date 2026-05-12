@@ -1,0 +1,6 @@
+ID="04-norecord"
+DESC="问问题并加 /norecord 后无任何 md 新增"
+PROMPT="/norecord 简单告诉我 Python 的 list comprehension 怎么写一个平方列表。不要写入知识库。"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_md_added_count .test_started_at 0"

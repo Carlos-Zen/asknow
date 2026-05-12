@@ -1,0 +1,6 @@
+ID="07-status-counter"
+DESC="单次问答应使 STATUS.md.total_files 增至 >=1"
+PROMPT="什么是 vector database？给我讲清楚它和传统数据库的差别、典型代表（Pinecone/Weaviate/Milvus/Qdrant）、以及选型上的 trade-off。按知识库沉淀规则写入。"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_status_field_ge STATUS.md total_files 1"

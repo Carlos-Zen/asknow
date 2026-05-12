@@ -1,0 +1,6 @@
+ID="08-journal-write"
+DESC="问答后 journal/<今日>.md 应存在"
+PROMPT="什么是 monorepo？给我讲讲它的优劣势、典型工具（Nx/Turborepo/pnpm workspaces）、以及什么场景下不应该用。要按知识库规则沉淀。"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_file_exists journal/$(date +%Y-%m-%d).md"

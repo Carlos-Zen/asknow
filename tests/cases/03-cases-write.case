@@ -1,0 +1,7 @@
+ID="03-cases-write"
+DESC="问『我遇到了 X 排查过 Y』后 cases/ 下应有新增 md"
+PROMPT="我们线上 PostgreSQL 数据库突然出现连接池耗尽的告警。排查过程：先看 pg_stat_activity 发现大量 idle in transaction 连接；查代码发现一个新加的 ORM 调用没有显式 commit；修复后告警恢复。请按案例复盘写入知识库（现象/排查/根因/修复/启示五段）。"
+SKIP_HARNESS=""
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_dir_has_md cases
+assert_dir_md_frontmatter cases category cases"

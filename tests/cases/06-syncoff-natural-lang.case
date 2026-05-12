@@ -1,0 +1,6 @@
+ID="06-syncoff-natural-lang"
+DESC="自然语言『关闭自动同步』应识别并持久化为 auto-sync-on-end=false"
+PROMPT="关闭自动同步，以后对话结束不要再自动推到飞书了。请把这个开关持久化保存。"
+SKIP_HARNESS="hermes"
+PRE_BOOTSTRAP="true"
+ASSERTIONS="assert_feishu_option FEISHU_MAP.md auto-sync-on-end false"
